@@ -1,10 +1,36 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { paleta } from '@/constants/paleta';
 import { listarPlaylists, Playlist } from '@/services/aurafy';
-import { CartaoPlaylist } from '@/components/CartaoPlaylist';
+import { Cabecalho } from '@/components/Cabecalho';
 import { Estado } from '@/components/Estado';
+
+function Topo() {
+  return (
+    <>
+      <View style={s.curtidas}>
+        <View style={s.curtidasIcone}>
+          <Ionicons name="heart" size={30} color={paleta.branco} />
+        </View>
+        <View style={s.curtidasTextos}>
+          <Text style={s.curtidasTitulo}>Músicas Curtidas</Text>
+          <Text style={s.curtidasInfo}>Lista  •  10 Músicas</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={22} color={paleta.textoSuave} />
+      </View>
+
+      <View style={s.linhaTitulo}>
+        <Text style={s.secao}>Playlists</Text>
+        <Pressable style={s.criar} onPress={() => console.log('Criar playlist')}>
+          <Ionicons name="add" size={16} color={paleta.textoSuave} />
+          <Text style={s.criarTxt}>Criar Playlist</Text>
+        </Pressable>
+      </View>
+    </>
+  );
+}
 
 export default function Playlists() {
   const [lista, setLista] = useState<Playlist[]>([]);
@@ -50,31 +76,28 @@ export default function Playlists() {
     return (
       <FlatList
         data={lista}
+        numColumns={3}
         keyExtractor={(p) => String(p.id)}
+        ListHeaderComponent={<Topo />}
         renderItem={({ item }) => (
-          <CartaoPlaylist
-            playlist={item}
+          <Pressable
+            style={({ pressed }) => [s.celula, pressed && { opacity: 0.7 }]}
             onPress={() => router.push({ pathname: '/detalhes', params: { id: String(item.id) } })}
-          />
+          >
+            <Image source={{ uri: item.capaUrl }} style={s.capa} />
+            <Text style={s.nome} numberOfLines={1}>{item.nome}</Text>
+          </Pressable>
         )}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        refreshControl={
-          <RefreshControl refreshing={atualizando} onRefresh={puxar} colors={[paleta.destaque]} />
-        }
         ListEmptyComponent={<Estado mensagem="Nenhuma playlist criada ainda." />}
+        contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 20 }}
+        refreshControl={<RefreshControl refreshing={atualizando} onRefresh={puxar} colors={[paleta.destaque]} />}
       />
     );
   };
 
   return (
     <View style={s.tela}>
-      <Text style={[s.faixa, s.marca]}>aurafy</Text>
-      <View style={[s.faixa, s.cabecalho]}>
-        <Text style={s.secao}>Playlists</Text>
-        <Pressable onPress={() => router.push('/musicas')}>
-          <Text style={s.link}>Todas as músicas ›</Text>
-        </Pressable>
-      </View>
+      <Cabecalho />
       {conteudo()}
     </View>
   );
@@ -82,24 +105,34 @@ export default function Playlists() {
 
 const s = StyleSheet.create({
   tela: { flex: 1, backgroundColor: paleta.fundo },
-  faixa: { paddingHorizontal: 16 },
-  marca: {
-    paddingVertical: 14,
-    borderBottomWidth: 1.5,
-    borderBottomColor: paleta.bordaForte,
-    fontSize: 24,
-    fontWeight: '900',
-    letterSpacing: -0.5,
-    color: paleta.destaque,
+
+  curtidas: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6, paddingVertical: 16 },
+  curtidasIcone: {
+    width: 64,
+    height: 64,
+    borderRadius: 4,
+    backgroundColor: paleta.destaque,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
   },
-  cabecalho: {
+  curtidasTextos: { flex: 1 },
+  curtidasTitulo: { fontSize: 17, fontWeight: '600', color: paleta.texto, marginBottom: 4 },
+  curtidasInfo: { fontSize: 13, color: paleta.textoSuave },
+
+  linhaTitulo: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: paleta.borda,
+    paddingHorizontal: 6,
+    marginTop: 8,
+    marginBottom: 10,
   },
   secao: { fontSize: 22, fontWeight: '800', color: paleta.texto },
-  link: { fontSize: 15, fontWeight: '600', color: paleta.textoSuave },
+  criar: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  criarTxt: { fontSize: 13, color: paleta.textoSuave },
+
+  celula: { width: '33.333%', padding: 6 },
+  capa: { width: '100%', aspectRatio: 1, borderRadius: 2, backgroundColor: paleta.superficie, marginBottom: 8 },
+  nome: { fontSize: 13, color: paleta.texto },
 });

@@ -35,7 +35,7 @@ function Banner() {
                 <Text style={s.bannerTag}>Lançamento</Text>
                 <View style={s.bannerTituloLinha}>
                     <Text style={s.bannerTitulo}>Happier Than Ever</Text>
-                    <Ionicons name="play-circle" size={20} color={paleta.branco} style={{ marginLeft: 6 }} />
+                    <Ionicons name="play-circle" size={30} color={paleta.branco} style={{ marginLeft: 0 }} />
                 </View>
                 <Text style={s.bannerArtista}>Billie Eilish</Text>
             </View>
