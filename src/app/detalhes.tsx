@@ -1,35 +1,31 @@
 import { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { paleta } from '@/constants/paleta';
-import { buscarPlaylist, formatarDuracao, Playlist } from '@/services/aurafy';
-import { CartaoMusica } from '@/components/CartaoMusica';
+import { buscarPlaylist, Musica, Playlist } from '@/services/aurafy';
 import { Estado } from '@/components/Estado';
 
-function Linha({ rotulo, valor }: { rotulo: string; valor: string }) {
+function Faixa({ musica, aoTocar }: { musica: Musica; aoTocar: () => void }) {
   return (
-    <View style={s.linha}>
-      <Text style={s.rotulo}>{rotulo}</Text>
-      <Text style={s.valor}>{valor}</Text>
-    </View>
-  );
-}
-
-function Botao({ icone, texto, primario, onPress }: { icone: string; texto: string; primario?: boolean; onPress: () => void }) {
-  const cor = primario ? paleta.branco : paleta.texto;
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [s.botao, primario ? s.botaoPrimario : s.botaoSecundario, pressed && { opacity: 0.8 }]}
-    >
-      <Text style={[s.botaoIcone, { color: cor, fontSize: primario ? 16 : 20 }]}>{icone}</Text>
-      <Text style={[s.botaoTxt, { color: cor }]}>{texto}</Text>
+    <Pressable style={({ pressed }) => [s.faixa, pressed && { opacity: 0.7 }]} onPress={aoTocar}>
+      <View style={s.play}>
+        <Ionicons name="play" size={16} color={paleta.fundo} style={{ marginLeft: 2 }} />
+      </View>
+      <View style={s.faixaTextos}>
+        <Text style={s.faixaTitulo} numberOfLines={1}>{musica.titulo}</Text>
+        <Text style={s.faixaArtista} numberOfLines={1}>{musica.artista}</Text>
+      </View>
+      <Ionicons name="ellipsis-horizontal" size={20} color={paleta.textoSuave} />
     </Pressable>
   );
 }
 
 export default function Detalhes() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const insets = useSafeAreaInsets();
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [falha, setFalha] = useState<string | null>(null);
@@ -45,71 +41,68 @@ export default function Detalhes() {
       .finally(() => setCarregando(false));
   }, [id]);
 
-  if (carregando) return <View style={s.tela}><Estado carregando mensagem="Carregando detalhes..." /></View>;
-  if (falha || !playlist) return <View style={s.tela}><Estado erro mensagem={falha ?? 'Playlist não encontrada.'} /></View>;
+  const voltar = () => (router.canGoBack() ? router.back() : router.replace('/playlists'));
 
-  const duracaoTotal = playlist.musicas.reduce((total, m) => total + m.duracaoSegundos, 0);
+  const conteudo = () => {
+    if (carregando) return <Estado carregando mensagem="Carregando detalhes..." />;
+    if (falha || !playlist) return <Estado erro mensagem={falha ?? 'Playlist não encontrada.'} />;
+
+    return (
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        <View style={[s.topo, { paddingTop: insets.top + 56 }]}>
+          <LinearGradient colors={[paleta.destaque, paleta.fundo]} style={StyleSheet.absoluteFill} />
+          <Image source={{ uri: playlist.capaUrl }} style={s.capa} />
+          <Text style={s.titulo}>{playlist.nome}</Text>
+          <Text style={s.descricao}>{playlist.descricao || 'Nenhuma descrição disponível.'}</Text>
+        </View>
+
+        {playlist.musicas.length === 0 && <Text style={s.vazio}>Esta playlist ainda não tem músicas.</Text>}
+
+        {playlist.musicas.map((m) => (
+          <Faixa
+            key={m.id}
+            musica={m}
+            aoTocar={() =>
+              router.push({ pathname: '/tocando', params: { id: String(m.id), playlistId: String(playlist.id) } })
+            }
+          />
+        ))}
+      </ScrollView>
+    );
+  };
 
   return (
     <View style={s.tela}>
       <StatusBar barStyle="light-content" />
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <View style={s.banner}>
-          <Image source={{ uri: playlist.capaUrl }} style={s.bannerImg} resizeMode="cover" />
-        </View>
-
-        <View style={s.corpo}>
-          <Text style={s.titulo}>{playlist.nome}</Text>
-          <View style={s.meta}>
-            <Text style={s.metaTxt}>{`${playlist.musicas.length} músicas  ·  ${formatarDuracao(duracaoTotal)}`}</Text>
-          </View>
-
-          <Botao primario icone="▶" texto="Ouvir" onPress={() => console.log('Ouvir:', playlist.nome)} />
-          <Botao icone="♡" texto="Curtir" onPress={() => console.log('Curtida:', playlist.nome)} />
-
-          <View style={s.separador} />
-          <Text style={s.cabecalho}>DESCRIÇÃO</Text>
-          <Text style={s.descricao}>{playlist.descricao || 'Nenhuma descrição disponível.'}</Text>
-          <View style={s.separador} />
-
-          <Linha rotulo="Músicas" valor={String(playlist.musicas.length)} />
-          <Linha rotulo="Duração" valor={formatarDuracao(duracaoTotal)} />
-
-          <View style={s.separador} />
-          <Text style={s.cabecalho}>MÚSICAS</Text>
-        </View>
-
-        {playlist.musicas.map((m) => (
-          <CartaoMusica key={m.id} musica={m} />
-        ))}
-      </ScrollView>
+      {conteudo()}
+      <Pressable style={[s.voltar, { top: insets.top + 8 }]} onPress={voltar} hitSlop={8}>
+        <Ionicons name="chevron-back" size={28} color={paleta.texto} />
+      </Pressable>
     </View>
   );
 }
 
 const s = StyleSheet.create({
   tela: { flex: 1, backgroundColor: paleta.fundo },
-  banner: {
-    width: '100%',
-    height: 240,
-    backgroundColor: paleta.superficie,
-    borderBottomWidth: 1.5,
-    borderBottomColor: paleta.bordaForte,
+  voltar: { position: 'absolute', left: 12, zIndex: 10, width: 40, height: 40, justifyContent: 'center' },
+
+  topo: { alignItems: 'center', paddingHorizontal: 24, paddingBottom: 36 },
+  capa: { width: 170, height: 170, borderRadius: 2, backgroundColor: paleta.superficie, marginBottom: 24 },
+  titulo: { fontSize: 24, fontWeight: '700', color: paleta.texto, marginBottom: 8 },
+  descricao: { fontSize: 14, color: paleta.textoSuave, textAlign: 'center' },
+
+  faixa: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 20 },
+  play: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: paleta.texto,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
   },
-  bannerImg: { width: '100%', height: '100%' },
-  corpo: { paddingTop: 16, paddingHorizontal: 16 },
-  titulo: { fontSize: 32, fontWeight: '900', letterSpacing: -0.5, color: paleta.texto, marginBottom: 8 },
-  meta: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  metaTxt: { fontSize: 15, fontWeight: '500', color: paleta.textoSuave },
-  botao: { height: 50, borderRadius: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  botaoPrimario: { backgroundColor: paleta.destaque, marginBottom: 12 },
-  botaoSecundario: { backgroundColor: paleta.chip, borderWidth: 1.5, borderColor: paleta.bordaForte, marginBottom: 16 },
-  botaoIcone: { marginRight: 10, fontWeight: '600' },
-  botaoTxt: { fontSize: 18, fontWeight: '800' },
-  separador: { height: 1.5, marginVertical: 16, backgroundColor: paleta.bordaForte },
-  cabecalho: { fontSize: 14, fontWeight: '800', letterSpacing: 0.5, color: paleta.texto, marginBottom: 10, marginTop: 4 },
-  descricao: { fontSize: 15, lineHeight: 22, color: paleta.linha, marginBottom: 4 },
-  linha: { flexDirection: 'row', alignItems: 'center', marginVertical: 6 },
-  rotulo: { width: 90, fontSize: 15, fontWeight: '500', color: paleta.textoApagado },
-  valor: { flex: 1, fontSize: 15, fontWeight: '600', color: paleta.texto },
+  faixaTextos: { flex: 1, marginRight: 12 },
+  faixaTitulo: { fontSize: 16, fontWeight: '500', color: paleta.texto, marginBottom: 2 },
+  faixaArtista: { fontSize: 13, color: paleta.textoSuave },
+  vazio: { textAlign: 'center', color: paleta.textoApagado, marginTop: 24 },
 });
