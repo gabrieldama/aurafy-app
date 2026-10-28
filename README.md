@@ -16,7 +16,6 @@ Aplicativo mobile do **Aurafy**, um player de música inspirado no Spotify, feit
 |------|---------|--------------------|
 | Início (boas-vindas) | `src/app/index.tsx` | — |
 | Início (abas) | `src/app/(tabs)/inicio.tsx` | — |
-| Pesquisar | `src/app/(tabs)/pesquisar.tsx` | — |
 | Playlists | `src/app/(tabs)/playlists.tsx` | `GET /api/playlists` |
 | Detalhes da playlist | `src/app/detalhes.tsx` | `GET /api/playlists/{id}` |
 | Todas as músicas | `src/app/musicas.tsx` | `GET /api/musicas` |
@@ -56,37 +55,6 @@ src
 └── imagens.d.ts
 ```
 
-## Como executar
-
-1. Suba a API (`aurafy-api`) na sua máquina.
-2. Instale as dependências:
-
-```bash
-npm install
-```
-
-3. Inicie o app:
-
-```bash
-npx expo start --web   # no navegador do computador
-npx expo start         # no celular, lendo o QR Code com o Expo Go
-```
-
-Para rodar no celular, troque `localhost` em `src/services/aurafy.ts` pelo IP do computador (ex.: `http://192.168.0.15:8080/api`). O celular e o computador precisam estar na mesma rede Wi-Fi.
-
-## Protótipo
-
-O protótipo foi feito no Figma: [Aurafy no Figma](https://www.figma.com/design/65uD3qznQ2rNCgoUyu3UK6/Untitled?node-id=0-1&t=6wcefZgdHf5SSKry-1)
-
-App mobile do Aurafy feito com Expo. Ele consome a API do repositório aurafy-api.
-
-## Telas
-
-- Início
-- Playlists (`GET /api/playlists`)
-- Detalhes da playlist (`GET /api/playlists/{id}`)
-- Músicas (`GET /api/musicas`)
-
 ## Como rodar
 
 Primeiro suba a API (aurafy-api). Depois:
@@ -101,7 +69,3 @@ Para testar no celular, troque `localhost` pelo IP do computador no arquivo `src
 ## Protótipo
 
 https://www.figma.com/design/65uD3qznQ2rNCgoUyu3UK6/Untitled?node-id=0-1&t=6wcefZgdHf5SSKry-1
-
-
-
-
