@@ -3,6 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { paleta } from '@/constants/paleta';
 import { Musica } from '@/services/aurafy';
+import { router } from 'expo-router';
 
 export function LinhaMusica({ musica }: { musica: Musica }) {
   const [curtida, setCurtida] = useState(false);
@@ -25,7 +26,7 @@ export function LinhaMusica({ musica }: { musica: Musica }) {
 
       <Pressable
         style={({ pressed }) => [s.play, pressed && { opacity: 0.7 }]}
-        onPress={() => console.log('Tocar:', musica.titulo)}
+        onPress={() => router.push({ pathname: '/tocando', params: { id: String(musica.id) } })}
       >
         <Ionicons name="play" size={16} color={paleta.textoSuave} />
       </Pressable>

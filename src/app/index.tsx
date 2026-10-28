@@ -1,56 +1,98 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import banner from '../../assets/images/banner.png';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { paleta } from '@/constants/paleta';
+import { Logo } from '@/components/Logo';
 
 export default function Inicio() {
+  const insets = useSafeAreaInsets();
+
   return (
     <View style={s.tela}>
-      <Image source={banner} style={s.foto} />
-      <View style={s.textos}>
-        <Text style={s.marca}>aurafy</Text>
-        <Text style={s.slogan}>Suas músicas e playlists favoritas. Ouça onde quiser.</Text>
+      <View style={s.fotoBox} />
+
+      <LinearGradient
+        colors={['transparent', 'rgba(18,18,18,0.7)', paleta.fundo]}
+        style={s.degrade}
+      />
+
+      <View style={[s.conteudo, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 24 }]}>
+        <View style={s.textosBox}>
+          <Logo altura={40} />
+          <Text style={s.slogan}>Suas músicas e playlists favoritas. Ouça onde quiser.</Text>
+        </View>
+
+        <Pressable
+          style={({ pressed }) => [s.entrar, pressed && s.entrarPressionado]}
+          onPress={() => router.replace('/inicio')}
+        >
+          <Text style={s.entrarTxt}>Descobrir Músicas</Text>
+        </Pressable>
       </View>
-      <Pressable
-        style={({ pressed }) => [s.entrar, pressed && { opacity: 0.8 }]}
-        onPress={() => router.replace('/inicio')}
-      >
-        <Text style={s.entrarTxt}>Entrar</Text>
-        <Text style={s.entrarSeta}>→</Text>
-      </Pressable>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  tela: {
+  tela: { flex: 1, backgroundColor: paleta.fundo },
+
+  fotoBox: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '60%',
+    backgroundColor: paleta.superficie
+  },
+
+  degrade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: '30%',
+    height: '45%'
+  },
+
+  conteudo: {
     flex: 1,
-    backgroundColor: paleta.fundo,
+    paddingHorizontal: 24,
     justifyContent: 'space-between',
-    paddingTop: 10,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
+    zIndex: 2,
   },
-  foto: {
-    width: '100%',
-    height: '63%',
-    borderRadius: 2,
-    borderWidth: 2,
-    borderColor: paleta.bordaForte,
-    backgroundColor: paleta.superficie,
+
+  textosBox: {
+    marginTop: '65%',
+    alignItems: 'center',
   },
-  textos: { marginVertical: 10 },
-  marca: { fontSize: 44, fontWeight: '900', letterSpacing: -1, color: paleta.destaque, marginBottom: 8 },
-  slogan: { fontSize: 18, lineHeight: 26, fontWeight: '500', color: paleta.texto },
+
+  slogan: {
+    fontSize: 22,
+    lineHeight: 30,
+    fontWeight: '700',
+    color: paleta.texto,
+    marginTop: 16,
+    letterSpacing: -0.5,
+    textAlign: 'center',
+  },
+
   entrar: {
-    height: 56,
-    borderRadius: 2,
-    paddingHorizontal: 20,
+    height: 54,
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     backgroundColor: paleta.destaque,
+    gap: 8,
+    marginBottom: 20,
   },
-  entrarTxt: { fontSize: 20, fontWeight: '700', color: paleta.branco },
-  entrarSeta: { fontSize: 22, fontWeight: '600', color: paleta.branco },
+  entrarPressionado: {
+    opacity: 0.9,
+    transform: [{ scale: 0.99 }],
+  },
+  entrarTxt: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: paleta.branco
+  },
 });
