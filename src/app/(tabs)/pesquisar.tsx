@@ -3,13 +3,9 @@ import { paleta } from '@/constants/paleta';
 
 export default function Pesquisar() {
     return (
-        <View style={s.tela}>
-            <Text style={s.txt}>Pesquisar (em breve)</Text>
+        <View >
+
         </View>
     );
 }
 
-const s = StyleSheet.create({
-    tela: { flex: 1, backgroundColor: paleta.fundo, alignItems: 'center', justifyContent: 'center' },
-    txt: { color: paleta.textoApagado, fontSize: 16 },
-});
