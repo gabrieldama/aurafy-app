@@ -69,7 +69,7 @@ export function AdicionarNaPlaylist({ visivel, musica, onFechar }: Props) {
 }
 
 const s = StyleSheet.create({
-    fundo: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.55)' },
+    fundo: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0)' },
     folha: {
         height: '55%',
         backgroundColor: paleta.superficie,

@@ -8,7 +8,7 @@ type NomeIcone = ComponentProps<typeof Ionicons>['name'];
 
 const icone =
     (ativo: NomeIcone, inativo: NomeIcone) =>
-        ({ color, focused }: { color: string; focused: boolean }) =>
+        ({ color, focused }: { color: any; focused: boolean }) =>
             <Ionicons name={focused ? ativo : inativo} size={24} color={color} />;
 
 export default function TabsLayout() {
@@ -33,7 +33,11 @@ export default function TabsLayout() {
             }}
         >
             <Tabs.Screen name="inicio" options={{ title: 'Início', tabBarIcon: icone('home', 'home-outline') }} />
-            <Tabs.Screen name="pesquisar" options={{ title: 'Pesquisar', tabBarIcon: icone('search', 'search-outline') }} />
+            <Tabs.Screen
+                name="pesquisar"
+                options={{ title: 'Pesquisar', tabBarIcon: icone('search', 'search-outline') }}
+                listeners={{ tabPress: (e) => e.preventDefault() }}
+            />
             <Tabs.Screen name="playlists" options={{ title: 'Playlists', tabBarIcon: icone('albums', 'albums-outline') }} />
         </Tabs>
     );

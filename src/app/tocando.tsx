@@ -55,19 +55,19 @@ export default function Tocando() {
         router.setParams({ id: String(fila[novo].id) });
     };
 
-    // zera o tempo ao trocar de música
+
     useEffect(() => {
         setSegundos(0);
     }, [id]);
 
-    // cronômetro simulado (ainda não há áudio de verdade)
+
     useEffect(() => {
         if (!tocando || !musica) return;
         const t = setInterval(() => setSegundos((s) => s + 1), 1000);
         return () => clearInterval(t);
     }, [tocando, musica?.id]);
 
-    // fim da música
+
     useEffect(() => {
         if (!musica || duracao === 0 || segundos < duracao) return;
         if (repetir) setSegundos(0);
@@ -138,7 +138,7 @@ export default function Tocando() {
             <StatusBar barStyle="light-content" />
             <LinearGradient colors={[paleta.destaque, paleta.fundo]} style={s.gradiente} />
 
-            <View style={[s.cabecalho, { paddingTop: insets.top + 8 }]}>
+            <View style={[s.cabecalho, { paddingTop: insets.top + 20 }]}>
                 <Pressable hitSlop={8} onPress={voltar} style={s.lado}>
                     <Ionicons name="chevron-back" size={28} color={paleta.texto} />
                 </Pressable>
