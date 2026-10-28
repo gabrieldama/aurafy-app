@@ -13,7 +13,7 @@ export default function Inicio() {
       </View>
       <Pressable
         style={({ pressed }) => [s.entrar, pressed && { opacity: 0.8 }]}
-        onPress={() => router.push('/playlists')}
+        onPress={() => router.replace('/inicio')}
       >
         <Text style={s.entrarTxt}>Entrar</Text>
         <Text style={s.entrarSeta}>→</Text>
